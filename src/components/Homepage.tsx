@@ -2,6 +2,7 @@ import Input from './Input'
 import Card from './Card'
 import { useState, useRef, useEffect } from 'react'
 import {captchas} from './Captcha'
+import Maps from './Maps'
 
 interface Question {
     id: number;
@@ -255,6 +256,7 @@ export default function Home(){
 
     return (
         <>
+            {/* <Maps /> */}
             <h1>* The Password Game</h1>
             <div>
                 <h3 className='text-3xl font-bold underline'>Please choose a password</h3>
