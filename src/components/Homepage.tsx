@@ -1,8 +1,9 @@
 import Input from './Input'
 import Card from './Card'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import {captchas} from './Captcha'
 import Maps from './Maps'
+import { LoadScript } from '@react-google-maps/api'
 
 interface Question {
     id: number;
@@ -28,6 +29,10 @@ export default function Home(){
 
     const refreshIndex = () => {
         indexRef.current = randomIndex()
+    }
+
+    function isLeapYear(year: number): boolean {
+        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
     }
 
     const questions: Question[] = [
@@ -92,7 +97,7 @@ export default function Home(){
         },
         {
             id: 5,
-            text: 'Your password must include a month of the year f',
+            text: 'Your password must include a month of the year',
             isTrue: (inputValue): boolean => {
                 const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
                 
@@ -173,9 +178,28 @@ export default function Home(){
                 return true
             }
         },
-        
-    ]
+        {
+            id: 12,
+            text: 'Your password must include a leap year',
+            isTrue: (inputValue): boolean => {
+                let currentNumber = ''
+                let hasLeapYear = false
 
+                for(const c of inputValue) {
+                    if(!isNaN(parseInt(c))){
+                        currentNumber += c
+                        const num = parseInt(currentNumber)
+                        if(isLeapYear(num)){
+                            hasLeapYear = true
+                            break
+                        }
+                        currentNumber = ''
+                    }
+                } 
+                return hasLeapYear
+            }
+        }   
+    ]
 
     function isRomanNumeral(char: string): boolean {
         const romanNumerals = ["I", "V", "X", "L", "C", "D", "M"];
@@ -251,12 +275,15 @@ export default function Home(){
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        
         setPasswordInput(e.target.value)
     }
 
     return (
         <>
-            {/* <Maps /> */}
+            {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
+                <Maps />
+            </LoadScript> */}
             <h1>* The Password Game</h1>
             <div>
                 <h3 className='text-3xl font-bold underline'>Please choose a password</h3>

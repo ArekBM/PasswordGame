@@ -1,7 +1,4 @@
-import React from 'react'
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api'
-
-
+import { GoogleMap, StreetViewPanorama } from '@react-google-maps/api'
 
 const containerStyle = { 
   width: '400px',
@@ -13,30 +10,21 @@ const center = {
   lng: -38.528
 }
 
-function Maps(){
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_KEY
-  })
-
-  const [ map, setMap ] = React.useState(null)
-
-  const onLoad = React.useCallback(function callback(map: any) {
-    const bounds = new window.google.maps.LatLngBounds(center)
-    map.fitBounds(bounds);
-
-    setMap(map)
-  }, [])
-
-  console.log(import.meta.env)
-  return isLoaded ? (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={center}
-      zoom={10}
-      onLoad={onLoad}
-    ></GoogleMap>
-  ) : <></>
+const options = {
+  position: center,
+  pov: {
+    heading: 0,
+    pitch: 0
+  },
+  zoom: 1
 }
 
-export default React.memo(Maps)
+function Maps(){
+  return (
+    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
+      <StreetViewPanorama options={{position: center, visible: true }}/>
+    </GoogleMap>
+  );
+}
+
+export default Maps;
