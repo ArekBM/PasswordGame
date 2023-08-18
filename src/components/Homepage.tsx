@@ -2,6 +2,7 @@ import Input from './Input'
 import Card from './Card'
 import { useState, useRef } from 'react'
 import {captchas} from './Captcha'
+import { puzzles } from './ChessPuzzles'
 import Maps from './Maps'
 import { LoadScript } from '@react-google-maps/api'
 
@@ -198,6 +199,35 @@ export default function Home(){
                 } 
                 return hasLeapYear
             }
+        },
+        {
+            id: 13,
+            text: 'Your password must include the best move in algebraic chess notation',
+            isTrue: (inputValue): boolean => {
+                for(const puzzle of puzzles){
+                    if(inputValue.includes(puzzle.val)){
+                        return true
+                    }
+                }
+                return false
+            }
+        },
+        {
+            id: 14,
+            text: '🥚 - This is my chicken Paul, He hasn\'t hatched yet, please put him in your password and keep him safe.',
+            isTrue: (inputValue): boolean => {
+                if(inputValue.includes('🥚')){
+                    return true
+                }
+                return false
+            }
+        },
+        {
+            id: 15,
+            text: 'The elements in your password must have atomic numbers that add up to 200',
+            isTrue: (inputValue): boolean => {
+                return true
+            } 
         }   
     ]
 
