@@ -225,11 +225,40 @@ export default function Home(){
         {
             id: 15,
             text: 'The elements in your password must have atomic numbers that add up to 200',
-            isTrue: (inputValue): boolean => {
+            isTrue: (inputValue) => {
+                checkElementVal(inputValue)
                 return true
             } 
-        }   
+        }
     ]
+
+    function isElement(char: string) : boolean {
+        const elements = ['H', 'He', 'Li', 'Be']
+        return elements.includes(char)
+    }
+
+    function elementToAtomic(element: string): number {
+        const elementToNumber : { [key: string] : number } = {
+            H: 1, He: 2, Li: 3, Be: 4
+        }
+
+        let atomicNumber = elementToNumber[element]
+
+        return atomicNumber
+
+    }
+
+    function checkElementVal(inputString: string) {
+        // Search by two chars
+        const elementArr : string[] = []
+
+        for(const char of inputString){
+            if(isElement(char)){
+                elementArr.push(char)
+            }
+        }
+        console.log(elementArr)
+    }
 
     function isRomanNumeral(char: string): boolean {
         const romanNumerals = ["I", "V", "X", "L", "C", "D", "M"];
@@ -324,6 +353,7 @@ export default function Home(){
                         return (
                             <li key={q.id}>
                                 <Card question={q.text}/>
+                                {/* move rendering to Card component */}
                                 {q.refresh && <button onClick={() => refreshIndex()}>Click Me</button>}
                             </li>
                         )
