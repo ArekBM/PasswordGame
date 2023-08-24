@@ -130,7 +130,7 @@ export default function Home(){
             id: 7,
             text: 'The roman numerals in your password should multiply to 35',
             isTrue: (inputValue): boolean => {
-                return checkRomanValue(inputValue)
+                return checkProductEquals35(inputValue)
             }
         },
         {
@@ -226,7 +226,7 @@ export default function Home(){
         {
             id: 15,
             text: 'The elements in your password must have atomic numbers that add up to 200',
-            isTrue: (inputValue) => {
+            isTrue: (inputValue): boolean => {
 
                 let result = 0
 
@@ -235,9 +235,15 @@ export default function Home(){
                 for(const element of elementsArr){
                     result += elementToAtomic(element)
                 }
-                console.log(result)
                 return result === 200
             } 
+        },
+        {
+            id: 16,
+            text: 'Oh no! Your password is on fire! Quick, put it out!',
+            isTrue: (inputValue): boolean => {
+                return true
+            }
         }
     ]
 
@@ -274,77 +280,93 @@ export default function Home(){
                 i++
             }
         }
-        console.log(elementArr)
         return elementArr
 
     }
 
     function isRomanNumeral(char: string): boolean {
-        const romanNumerals = ["I", "V", "X", "L", "C", "D", "M"];
-        return romanNumerals.includes(char);
+        const romanNumerals: { [key: string]: number } = {
+            I: 1,
+            V: 5,
+            X: 10,
+            L: 50,
+            C: 100,
+            D: 500,
+            M: 1000,
+        };
+        
+        return romanNumerals.hasOwnProperty(char);
     }
     
-    function romanToNumber(roman: string): number {
-        const romanToValue: { [key: string]: number } = {
-            I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000
+    function convertRomanToNumber(roman: string): number {
+        const romanNumerals: { [key: string]: number } = {
+            I: 1,
+            V: 5,
+            X: 10,
+            L: 50,
+            C: 100,
+            D: 500,
+            M: 1000,
         };
     
         let result = 0;
+        let prevValue = 0;
     
-        for (let i = 0; i < roman.length; i++) {
-            const current = romanToValue[roman[i]];
-            const next = romanToValue[roman[i + 1]];
+        for (let i = roman.length - 1; i >= 0; i--) {
+            const currentChar = roman[i];
+            const currentValue = romanNumerals[currentChar];
     
-            if (next && current < next) {
-                result += next - current;
-                i++;
+            if (currentValue >= prevValue) {
+                result += currentValue;
             } else {
-                result += current;
+                result -= currentValue;
             }
+    
+            prevValue = currentValue;
         }
     
         return result;
     }
     
-    function calculateProduct(romanChars: string[]): number {
-        let product = 1;
+    function findValidRomanSubstrings(input: string): string[] {
+        const validSubstrings: string[] = [];
+        const n = input.length;
     
-        let repeatCount = 1;
-        let prevChar = '';
+        for (let i = 0; i < n; i++) {
+            let currentSubstr = '';
+            let j = i;
     
-        for (const char of romanChars) {
-            if (char === prevChar) {
-                repeatCount++;
-            } else {
-                repeatCount = 1;
+            while (j < n && isRomanNumeral(input[j])) {
+                currentSubstr += input[j];
+                j++;
             }
     
-            if (repeatCount > 1) {
-                product /= romanToNumber(prevChar)
-                product += romanToNumber(char) * repeatCount;
-            } else {
-                product *= romanToNumber(char);
-            }
-    
-            prevChar = char;
-        }
-    
-        return product;
-    }
-    
-    function checkRomanValue(inputString: string): boolean {
-        const romanChars: string[] = [];
-    
-        for (const char of inputString) {
-            if (isRomanNumeral(char)) {
-                romanChars.push(char);
+            if (currentSubstr.length > 0) {
+                validSubstrings.push(currentSubstr);
+                i = j - 1; // Skip the checked substrings
             }
         }
 
-        const product = calculateProduct(romanChars);
+        console.log(validSubstrings)
+    
+        return validSubstrings;
+    }
+    
+    function checkProductEquals35(input: string): boolean {
+        const validSubstrings = findValidRomanSubstrings(input);
+        let product = 1;
+    
+        for (const substr of validSubstrings) {
+            product *= convertRomanToNumber(substr);
+        }
+
+        console.log(product)
     
         return product === 35;
     }
+    
+
+    
 
 
     const isQConditionMet = (question: Question) => {
