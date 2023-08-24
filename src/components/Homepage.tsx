@@ -21,7 +21,7 @@ export default function Home(){
     const [passwordInput, setPasswordInput] = useState('')
 
     const randomIndex = () => {
-        return Math.floor(Math.random() * 10)
+        return Math.floor(Math.random() * captchas.length)
     }
 
     const index = randomIndex()
@@ -156,6 +156,7 @@ export default function Home(){
             id: 10,
             text: 'Your password must include a two letter symbol from the periodic table',
             isTrue: (inputValue): boolean => {
+
                 const elements = ['He', 'Li', 'Be', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'Cl', 'Ar', 'Ca', 'Sc', 'Ti', 'Cr', 'Mn', 'Fe', 'Co', 
                 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 
                 'In', 'Sn', 'Sb', 'Te', 'Xe', 'Cs', 'Ba', 'La', 'Hf', 'Ta', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 
@@ -226,20 +227,23 @@ export default function Home(){
             id: 15,
             text: 'The elements in your password must have atomic numbers that add up to 200',
             isTrue: (inputValue) => {
-                checkElementVal(inputValue)
-                return true
+
+                let result = 0
+
+                const elementsArr = checkElementVal(inputValue)
+
+                for(const element of elementsArr){
+                    result += elementToAtomic(element)
+                }
+                console.log(result)
+                return result === 200
             } 
         }
     ]
 
-    function isElement(char: string) : boolean {
-        const elements = ['H', 'He', 'Li', 'Be']
-        return elements.includes(char)
-    }
-
     function elementToAtomic(element: string): number {
         const elementToNumber : { [key: string] : number } = {
-            H: 1, He: 2, Li: 3, Be: 4
+            H: 1, He: 2, Li: 3, Be: 4, B: 5, C: 6, N: 7, O: 8, F: 9, Ne: 10
         }
 
         let atomicNumber = elementToNumber[element]
@@ -250,14 +254,29 @@ export default function Home(){
 
     function checkElementVal(inputString: string) {
         // Search by two chars
+
+        const elements : string[] = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F' , 'Ne']
         const elementArr : string[] = []
 
-        for(const char of inputString){
-            if(isElement(char)){
-                elementArr.push(char)
+        let i = 0;
+        while( i < inputString.length){
+            let found = false
+            for(let j = elements.length - 1; j >= 0; j--){
+                const element = elements[j]
+                if(inputString.startsWith(element, i)){
+                    elementArr.push(element)
+                    i += element.length
+                    found = true
+                    break
+                }
+            }
+            if(!found){
+                i++
             }
         }
         console.log(elementArr)
+        return elementArr
+
     }
 
     function isRomanNumeral(char: string): boolean {
