@@ -242,10 +242,22 @@ export default function Home(){
             id: 16,
             text: 'Oh no! Your password is on fire! Quick, put it out!',
             isTrue: (inputValue): boolean => {
+                if(inputValue.length > 10){
+                    let fire = startAFire(inputValue)
+                }
+                if(inputValue.includes('🔥')){
+                    return false
+                }
                 return true
             }
         }
     ]
+
+    function startAFire(input: string): string {
+        const start = Math.floor(Math.random() * input.length)
+        console.log('hi')
+        return input.substring(0, start) + '🔥' + input.substring(start + 1, input.length - 1)
+    }
 
     function elementToAtomic(element: string): number {
         const elementToNumber : { [key: string] : number } = {
@@ -299,6 +311,8 @@ export default function Home(){
     }
     
     function convertRomanToNumber(roman: string): number {
+        //TODO fix 'VVII' input, currently interpreted as ['VVII'] instead of ['V', 'VII']
+        //Possible fix is break loop for double chars specifically for "V"
         const romanNumerals: { [key: string]: number } = {
             I: 1,
             V: 5,
@@ -329,6 +343,7 @@ export default function Home(){
     }
     
     function findValidRomanSubstrings(input: string): string[] {
+
         const validSubstrings: string[] = [];
         const n = input.length;
     
