@@ -135,6 +135,7 @@ export default function Home(){
         },
         {
             id: 8,
+            // Might have to change Input component to handle Ref 
             text: `Your password must include this CAPTCHA: ${captchas[indexRef.current].val}`,
             refresh: refreshIndex,
             isTrue: (inputValue): boolean => {
@@ -386,17 +387,32 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
-
-
-    // FIX BELOW RENDERING ERROR MISMATCH
-
     useEffect(() => {
+        // Change if statement to questionIndex[15]
         if(passwordInput.length === 10){
-            console.log('hi')
             const start = Math.floor(Math.random() * passwordInput.length)
             const passwordOnFire = passwordInput.substring(0, start) + '🔥' + passwordInput.substring(start + 1, passwordInput.length)
             setPasswordInput(passwordOnFire)
         }
+    }, [passwordInput])
+
+    useEffect(() => {
+        console.log('bang')
+        const intervalId = setInterval(() => {
+            if(passwordInput.includes('5')){
+                const index = passwordInput.indexOf('🔥')
+                let updatedInput = passwordInput
+
+                if( index > 0){
+                    updatedInput = passwordInput.substring(0, index - 1) + '🔥' + passwordInput.substring(index)
+                } else {
+                    updatedInput = '🔥' + passwordInput.substring(index + 1)
+                }
+
+                setPasswordInput(updatedInput)
+            }
+        }, 1000)
+        return () => clearInterval(intervalId)
     }, [passwordInput])
 
 
