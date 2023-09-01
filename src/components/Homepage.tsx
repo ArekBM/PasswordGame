@@ -26,8 +26,6 @@ export default function Home(){
 
     const index = randomIndex()
 
-    const currentPassword = useRef(passwordInput)
-
     const indexRef = useRef(index)
 
     const refreshIndex = () => {
@@ -252,10 +250,10 @@ export default function Home(){
         }
     ]
 
-    function startAFire(input: string): string {
-        const start = Math.floor(Math.random() * input.length)
-        return input.substring(0, start) + '🔥' + input.substring(start + 1, input.length)
-    }
+    // function startAFire(input: string): string {
+    //     const start = Math.floor(Math.random() * input.length)
+    //     return input.substring(0, start) + '🔥' + input.substring(start + 1, input.length)
+    // }
 
     function elementToAtomic(element: string): number {
         const elementToNumber : { [key: string] : number } = {
@@ -388,23 +386,21 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
-    if(passwordInput.length === 10){
-        currentPassword.current = passwordInput
-    }
 
-    if(passwordInput.length === 11){
-        useEffect(() => {
-            if(fireFlag === false){
-                console.log('h')
-                currentPassword.current = startAFire(currentPassword.current)
-                setPasswordInput(currentPassword.current)
-                setFireFlag(true)
-            }
-        }, [])
-    }
-    console.log(currentPassword.current)
-    console.log(passwordInput.length)
-    console.log(fireFlag)
+
+    // FIX BELOW RENDERING ERROR MISMATCH
+
+    useEffect(() => {
+        if(passwordInput.length === 10){
+            console.log('hi')
+            const start = Math.floor(Math.random() * passwordInput.length)
+            const passwordOnFire = passwordInput.substring(0, start) + '🔥' + passwordInput.substring(start + 1, passwordInput.length)
+            setPasswordInput(passwordOnFire)
+        }
+    }, [passwordInput])
+
+
+
     return (
         <>
             {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
