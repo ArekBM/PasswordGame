@@ -1,6 +1,6 @@
 import Input from './Input'
 import Card from './Card'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {captchas} from './Captcha'
 import { puzzles } from './ChessPuzzles'
 import Maps from './Maps'
@@ -17,14 +17,16 @@ export default function Home(){
     //TODO
     //INDEX into Questions to conditionally render questions based on order
 
-
     const [passwordInput, setPasswordInput] = useState('')
+    const [fireFlag, setFireFlag] = useState(false)
 
     const randomIndex = () => {
         return Math.floor(Math.random() * captchas.length)
     }
 
     const index = randomIndex()
+
+    const currentPassword = useRef(passwordInput)
 
     const indexRef = useRef(index)
 
@@ -242,9 +244,6 @@ export default function Home(){
             id: 16,
             text: 'Oh no! Your password is on fire! Quick, put it out!',
             isTrue: (inputValue): boolean => {
-                if(inputValue.length > 10){
-                    let fire = startAFire(inputValue)
-                }
                 if(inputValue.includes('🔥')){
                     return false
                 }
@@ -255,8 +254,7 @@ export default function Home(){
 
     function startAFire(input: string): string {
         const start = Math.floor(Math.random() * input.length)
-        console.log('hi')
-        return input.substring(0, start) + '🔥' + input.substring(start + 1, input.length - 1)
+        return input.substring(0, start) + '🔥' + input.substring(start + 1, input.length)
     }
 
     function elementToAtomic(element: string): number {
@@ -361,8 +359,6 @@ export default function Home(){
                 i = j - 1; // Skip the checked substrings
             }
         }
-
-        console.log(validSubstrings)
     
         return validSubstrings;
     }
@@ -374,8 +370,6 @@ export default function Home(){
         for (const substr of validSubstrings) {
             product *= convertRomanToNumber(substr);
         }
-
-        console.log(product)
     
         return product === 35;
     }
@@ -394,6 +388,23 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
+    if(passwordInput.length === 10){
+        currentPassword.current = passwordInput
+    }
+
+    if(passwordInput.length === 11){
+        useEffect(() => {
+            if(fireFlag === false){
+                console.log('h')
+                currentPassword.current = startAFire(currentPassword.current)
+                setPasswordInput(currentPassword.current)
+                setFireFlag(true)
+            }
+        }, [])
+    }
+    console.log(currentPassword.current)
+    console.log(passwordInput.length)
+    console.log(fireFlag)
     return (
         <>
             {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
