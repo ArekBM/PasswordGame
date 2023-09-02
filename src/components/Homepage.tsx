@@ -7,8 +7,9 @@ import Maps from './Maps'
 import { LoadScript } from '@react-google-maps/api'
 
 interface Question {
-    id: number;
-    text: string;
+    id: number
+    text: string
+    ref?: string
     refresh?: Function;
     isTrue: (inputValue: string) => boolean
 }
@@ -18,19 +19,22 @@ export default function Home(){
     //INDEX into Questions to conditionally render questions based on order
 
     const [passwordInput, setPasswordInput] = useState('')
-    const [fireFlag, setFireFlag] = useState(false)
+
+    const questionIndex = useRef(0)
 
     const randomIndex = () => {
         return Math.floor(Math.random() * captchas.length)
     }
 
-    const index = randomIndex()
+    let index = randomIndex()
 
-    const indexRef = useRef(index)
 
-    const refreshIndex = () => {
-        indexRef.current = randomIndex()
+
+    const refreshCaptcha = () => {
+        setCaptcha(captchas[randomIndex()].val)
     }
+
+    const [captcha, setCaptcha] = useState(captchas[index].val)
 
     function isLeapYear(year: number): boolean {
         return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
@@ -136,11 +140,12 @@ export default function Home(){
         {
             id: 8,
             // Might have to change Input component to handle Ref 
-            text: `Your password must include this CAPTCHA: ${captchas[indexRef.current].val}`,
-            refresh: refreshIndex,
+            // ref: `${captchas[indexRef.current].val}`,
+            text: `Your password must include this CAPTCHA: ${captcha}`,
+            refresh: refreshCaptcha,
             isTrue: (inputValue): boolean => {
 
-                if(inputValue.includes(captchas[indexRef.current].val)){
+                if(inputValue.includes(captcha)){
                     return true
                 }
                 return false
@@ -236,7 +241,12 @@ export default function Home(){
                 for(const element of elementsArr){
                     result += elementToAtomic(element)
                 }
-                return result === 200
+                
+                if(result === 200){
+                    questionIndex.current = 16
+                    return true
+                }
+                return false
             } 
         },
         {
@@ -335,6 +345,7 @@ export default function Home(){
     
             prevValue = currentValue;
         }
+        console.log(result)
     
         return result;
     }
@@ -388,33 +399,50 @@ export default function Home(){
     }
 
     useEffect(() => {
-        // Change if statement to questionIndex[15]
-        if(passwordInput.length === 10){
+        if(questionIndex.current === 16){
             const start = Math.floor(Math.random() * passwordInput.length)
             const passwordOnFire = passwordInput.substring(0, start) + '🔥' + passwordInput.substring(start + 1, passwordInput.length)
             setPasswordInput(passwordOnFire)
+            questionIndex.current = 17
         }
-    }, [passwordInput])
+    }, [questionIndex.current])
 
     useEffect(() => {
-        console.log('bang')
-        const intervalId = setInterval(() => {
-            if(passwordInput.includes('5')){
+        const fireLeft = setInterval(() => {
+            if(passwordInput.includes('🔥')){
                 const index = passwordInput.indexOf('🔥')
                 let updatedInput = passwordInput
 
-                if( index > 0){
+                if( index > 0 && passwordInput[0] !== '🔥'){
+                    console.log('left')
                     updatedInput = passwordInput.substring(0, index - 1) + '🔥' + passwordInput.substring(index)
-                } else {
-                    updatedInput = '🔥' + passwordInput.substring(index + 1)
-                }
-
+                } 
                 setPasswordInput(updatedInput)
             }
-        }, 1000)
-        return () => clearInterval(intervalId)
+        }, 800)
+        return () => clearInterval(fireLeft)
     }, [passwordInput])
 
+    // useEffect(() => {
+    //     const fireRight = setInterval(() => {
+    //         if(passwordInput[0] === '🔥'){
+    //             console.log('bang')
+    //             const lastIndex = passwordInput.lastIndexOf('🔥')
+    //             let updatedInput = passwordInput
+    //             let charOnFire = lastIndex + 1
+
+    //             if(passwordInput[-1] !== '🔥'){
+    //                 console.log('right')
+    //                 updatedInput = passwordInput.substring(0, charOnFire) + '🔥' + passwordInput.substring(charOnFire + 1)
+    //                 charOnFire++
+    //             }
+    //             setPasswordInput(updatedInput)
+    //         }
+    //     }, 800)
+    //     return () => clearInterval(fireRight)
+    // }, [passwordInput])
+
+    // console.log(passwordInput[0])
 
 
     return (
@@ -431,9 +459,9 @@ export default function Home(){
                     if(!isQConditionMet(q)){
                         return (
                             <li key={q.id}>
-                                <Card question={q.text}/>
+                                <Card question={q.text} />
                                 {/* move rendering to Card component */}
-                                {q.refresh && <button onClick={() => refreshIndex()}>Click Me</button>}
+                                {q.refresh && <button onClick={() => refreshCaptcha()}>Click Me</button>}
                             </li>
                         )
                     }
