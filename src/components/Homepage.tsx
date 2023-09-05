@@ -22,13 +22,13 @@ export default function Home(){
 
     const questionIndex = useRef(0)
 
+    const [fireFlag, setFireFlag] = useState(false)
+
     const randomIndex = () => {
         return Math.floor(Math.random() * captchas.length)
     }
 
     let index = randomIndex()
-
-
 
     const refreshCaptcha = () => {
         setCaptcha(captchas[randomIndex()].val)
@@ -85,6 +85,7 @@ export default function Home(){
             id: 4,
             text: 'The digits in your password must add up to 25',
             isTrue: (inputValue): boolean => {
+                //currently only counts ONCE 
                 let total = 0
                 for(let i = 0; i < inputValue.length; i++){
                     let number = inputValue.charCodeAt(i)
@@ -94,10 +95,10 @@ export default function Home(){
                     }
                     if(total === 25){
                         return true
-                    }
+                    } 
                 }
+                console.log(total)
                 return false
-
             }
         },
         {
@@ -139,8 +140,6 @@ export default function Home(){
         },
         {
             id: 8,
-            // Might have to change Input component to handle Ref 
-            // ref: `${captchas[indexRef.current].val}`,
             text: `Your password must include this CAPTCHA: ${captcha}`,
             refresh: refreshCaptcha,
             isTrue: (inputValue): boolean => {
@@ -258,13 +257,18 @@ export default function Home(){
                 }
                 return true
             }
+        },
+        {
+            id: 17,
+            text: 'Paul has now hatched, please remember to feed him.',
+            isTrue: (inputValue): boolean =>  {
+                if(inputValue.includes('🐛')){
+                    return true
+                }
+                return false
+            }
         }
     ]
-
-    // function startAFire(input: string): string {
-    //     const start = Math.floor(Math.random() * input.length)
-    //     return input.substring(0, start) + '🔥' + input.substring(start + 1, input.length)
-    // }
 
     function elementToAtomic(element: string): number {
         const elementToNumber : { [key: string] : number } = {
@@ -384,25 +388,24 @@ export default function Home(){
         return product === 35;
     }
     
-
-    
-
-
     const isQConditionMet = (question: Question) => {
         return question.isTrue(passwordInput)
     }
-
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         
         setPasswordInput(e.target.value)
     }
 
+
+    console.log(questionIndex.current)
+
     useEffect(() => {
-        if(questionIndex.current === 16){
+        if(questionIndex.current === 16 && !fireFlag){
             const start = Math.floor(Math.random() * passwordInput.length)
             const passwordOnFire = passwordInput.substring(0, start) + '🔥' + passwordInput.substring(start + 1, passwordInput.length)
             setPasswordInput(passwordOnFire)
+            setFireFlag(true)
             questionIndex.current = 17
         }
     }, [questionIndex.current])
@@ -421,6 +424,16 @@ export default function Home(){
             }
         }, 800)
         return () => clearInterval(fireLeft)
+    }, [passwordInput])
+
+    useEffect(() => {
+        const consumeFood = setInterval(() => {
+            if(questionIndex.current === 16 && passwordInput.includes('🐛')){
+                let paulAte = passwordInput.replace('🐛', '')
+                setPasswordInput(paulAte)
+            }
+        }, 20000)
+        return () => clearInterval(consumeFood)
     }, [passwordInput])
 
     // useEffect(() => {
@@ -442,7 +455,6 @@ export default function Home(){
     //     return () => clearInterval(fireRight)
     // }, [passwordInput])
 
-    // console.log(passwordInput[0])
 
 
     return (
