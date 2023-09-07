@@ -5,6 +5,7 @@ import {captchas} from './Captcha'
 import { puzzles } from './ChessPuzzles'
 import Maps from './Maps'
 import { LoadScript } from '@react-google-maps/api'
+// import { is69, getVideoDetails } from './Youtube'
 
 interface Question {
     id: number
@@ -262,12 +263,72 @@ export default function Home(){
             id: 17,
             text: 'Paul has now hatched, please remember to feed him.',
             isTrue: (inputValue): boolean =>  {
+                // Make function pop up window displaying catepillar, once copied then move to next 
                 if(inputValue.includes('🐛')){
                     return true
                 }
                 return false
             }
+        }, 
+        {
+            id: 18,
+            text: 'A sacrifice must be made. Pick 2 letters that you will no longer be able to use.',
+            isTrue: (inputValue): boolean => {
+                return true
+            }
+        },
+        {
+            id: 19, 
+            text: 'Your password must include the length of your password',
+            isTrue:(inputValue): boolean => {
+                if(inputValue.includes(`${inputValue.length}`)){
+                    return true
+                } else {
+                    return false
+                }
+            },
+        },
+        {
+            id: 20,
+            text: 'The length of your password must be a prime number',
+            isTrue: (inputValue): boolean => {
+                if(isPrime(inputValue.length) === true){
+                    console.log('yes')
+                    return true
+                } else {
+                    return false
+                }
+            }
+        },
+        {
+            id: 21,
+            text: 'Your password must include the current time',
+            isTrue: (inputValue): boolean => {
+                const currentDate = new Date()
+
+                const currentHours = currentDate.getHours().toString().padStart(2, '0')
+                const currentMinutes = currentDate.getMinutes().toString().padStart(2, '0')
+
+                const nonMHours = parseInt(currentHours) - 12
+
+                const currentTime = `${currentHours}:${currentMinutes}`
+                const nonMTime = `${nonMHours}:${currentMinutes}`
+                if(inputValue.includes(currentTime) || inputValue.includes(nonMTime)){
+                    return true 
+                } else {
+                    return false
+                }
+            }
         }
+        // {
+        //     id: 18,
+        //     text: 'Your password must include the URL of a 69 second long Youtube video',
+        //     isTrue: (inputValue) => {
+        //         if(questionIndex.current === 16)
+        //         // getVideoDetails([inputValue])
+        //         return true
+        //     }
+        // }
     ]
 
     function elementToAtomic(element: string): number {
@@ -387,6 +448,26 @@ export default function Home(){
     
         return product === 35;
     }
+
+    function isPrime(num: number): boolean {
+        if( num <= 1){
+            return false
+        }
+        if( num <= 3){
+            return true
+        }
+        if( num % 2 === 0 || num % 3 === 0){
+            return false
+        }
+        let i = 5
+        while(i * i <= num){
+            if(num % i === 0 || num % (i + 2) === 0){
+                return false
+            }
+            i += 6
+        }
+        return true
+    }
     
     const isQConditionMet = (question: Question) => {
         return question.isTrue(passwordInput)
@@ -397,8 +478,6 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
-
-    console.log(questionIndex.current)
 
     useEffect(() => {
         if(questionIndex.current === 16 && !fireFlag){
