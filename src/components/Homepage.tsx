@@ -490,17 +490,33 @@ export default function Home(){
             if(passwordInput.includes('🔥')){
                 const index = passwordInput.indexOf('🔥')
                 let updatedInput = passwordInput
+                console.log(passwordInput[0].charCodeAt(0).toString(16))
 
-                if( index > 0 && ((passwordInput[0] !== '🔥') || (updatedInput[updatedInput.length - 1] !== '🔥'))){
+                console.log(passwordInput[passwordInput.length - 1].codePointAt(0)?.toString(16))
+
+                
+
+                if((passwordInput[0].codePointAt(0)?.toString(16) !== 'd83d')){
                     if(Math.random() <= .5){
-                        updatedInput = passwordInput.substring(0, index - 1) + '🔥' + passwordInput.substring(index)
+                        console.log('left')
+                        let firstIndex = passwordInput.indexOf('🔥')
+                        updatedInput = passwordInput.substring(0, firstIndex - 1) + '🔥' + passwordInput.substring(firstIndex)
                     } else {
-                        
-                        let lastIndex = updatedInput.lastIndexOf('🔥')
-                        let dummy = updatedInput.substring(0, lastIndex + 2) + '🔥' + updatedInput.substring(lastIndex + 3)
-                        updatedInput = dummy
+                        if(updatedInput[updatedInput.length - 1].codePointAt(0)?.toString(16) != 'dd25'){
+                            let lastIndex = updatedInput.lastIndexOf('🔥')
+                            let rightDummy = updatedInput.substring(0, lastIndex + 2) + '🔥' + updatedInput.substring(lastIndex + 3)
+                            updatedInput = rightDummy
+                        }
+                        console.log('right')
                     }
-                } 
+                } else {
+                    if(updatedInput[updatedInput.length - 1].codePointAt(0)?.toString(16) != 'dd25'){
+                        let lastIndex = updatedInput.lastIndexOf('🔥')
+                        let rightDummy = updatedInput.substring(0, lastIndex + 2) + '🔥' + updatedInput.substring(lastIndex + 3)
+                        updatedInput = rightDummy
+                    }
+                    console.log('right')
+                }
                 setPasswordInput(updatedInput)
             }
         }, 800)
