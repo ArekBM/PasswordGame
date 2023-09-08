@@ -3,8 +3,8 @@ import Card from './Card'
 import { useState, useRef, useEffect } from 'react'
 import {captchas} from './Captcha'
 import { puzzles } from './ChessPuzzles'
-import Maps from './Maps'
-import { LoadScript } from '@react-google-maps/api'
+// import Maps from './Maps'
+// import { LoadScript } from '@react-google-maps/api'
 // import { is69, getVideoDetails } from './Youtube'
 
 interface Question {
@@ -19,12 +19,6 @@ export default function Home(){
     //TODO
     //INDEX into Questions to conditionally render questions based on order
 
-    const [passwordInput, setPasswordInput] = useState('')
-
-    const questionIndex = useRef(0)
-
-    const [fireFlag, setFireFlag] = useState(false)
-
     const randomIndex = () => {
         return Math.floor(Math.random() * captchas.length)
     }
@@ -35,7 +29,13 @@ export default function Home(){
         setCaptcha(captchas[randomIndex()].val)
     }
 
+    const [passwordInput, setPasswordInput] = useState('')
+
+    const [fireFlag, setFireFlag] = useState(false)
+
     const [captcha, setCaptcha] = useState(captchas[index].val)
+
+    const questionIndex = useRef(0)
 
     function isLeapYear(year: number): boolean {
         return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
@@ -98,7 +98,6 @@ export default function Home(){
                         return true
                     } 
                 }
-                console.log(total)
                 return false
             }
         },
@@ -293,7 +292,6 @@ export default function Home(){
             text: 'The length of your password must be a prime number',
             isTrue: (inputValue): boolean => {
                 if(isPrime(inputValue.length) === true){
-                    console.log('yes')
                     return true
                 } else {
                     return false
@@ -410,7 +408,6 @@ export default function Home(){
     
             prevValue = currentValue;
         }
-        console.log(result)
     
         return result;
     }
@@ -478,7 +475,6 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
-
     useEffect(() => {
         if(questionIndex.current === 16 && !fireFlag){
             const start = Math.floor(Math.random() * passwordInput.length)
@@ -490,19 +486,25 @@ export default function Home(){
     }, [questionIndex.current])
 
     useEffect(() => {
-        const fireLeft = setInterval(() => {
+        const fire = setInterval(() => {
             if(passwordInput.includes('🔥')){
                 const index = passwordInput.indexOf('🔥')
                 let updatedInput = passwordInput
 
-                if( index > 0 && passwordInput[0] !== '🔥'){
-                    console.log('left')
-                    updatedInput = passwordInput.substring(0, index - 1) + '🔥' + passwordInput.substring(index)
+                if( index > 0 && ((passwordInput[0] !== '🔥') || (updatedInput[updatedInput.length - 1] !== '🔥'))){
+                    if(Math.random() <= .5){
+                        updatedInput = passwordInput.substring(0, index - 1) + '🔥' + passwordInput.substring(index)
+                    } else {
+                        
+                        let lastIndex = updatedInput.lastIndexOf('🔥')
+                        let dummy = updatedInput.substring(0, lastIndex + 2) + '🔥' + updatedInput.substring(lastIndex + 3)
+                        updatedInput = dummy
+                    }
                 } 
                 setPasswordInput(updatedInput)
             }
         }, 800)
-        return () => clearInterval(fireLeft)
+        return () => clearInterval(fire)
     }, [passwordInput])
 
     useEffect(() => {
@@ -514,27 +516,6 @@ export default function Home(){
         }, 20000)
         return () => clearInterval(consumeFood)
     }, [passwordInput])
-
-    // useEffect(() => {
-    //     const fireRight = setInterval(() => {
-    //         if(passwordInput[0] === '🔥'){
-    //             console.log('bang')
-    //             const lastIndex = passwordInput.lastIndexOf('🔥')
-    //             let updatedInput = passwordInput
-    //             let charOnFire = lastIndex + 1
-
-    //             if(passwordInput[-1] !== '🔥'){
-    //                 console.log('right')
-    //                 updatedInput = passwordInput.substring(0, charOnFire) + '🔥' + passwordInput.substring(charOnFire + 1)
-    //                 charOnFire++
-    //             }
-    //             setPasswordInput(updatedInput)
-    //         }
-    //     }, 800)
-    //     return () => clearInterval(fireRight)
-    // }, [passwordInput])
-
-
 
     return (
         <>
