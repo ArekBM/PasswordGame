@@ -149,7 +149,7 @@ export default function Home(){
         {
             id: 9,
             text: 'Your password must include today\'s wordle answer',
-            isTrue: (inputValue): boolean => {
+            isTrue: (): boolean => {
                 return true
             }
         },
@@ -177,7 +177,7 @@ export default function Home(){
         {
             id: 11,
             text: 'Your password must include the current phase of the moon as an emoji',
-            isTrue: (inputValue): boolean => {
+            isTrue: (): boolean => {
                 return true
             }
         },
@@ -268,7 +268,7 @@ export default function Home(){
         {
             id: 18,
             text: 'A sacrifice must be made. Pick 2 letters that you will no longer be able to use.',
-            isTrue: (inputValue): boolean => {
+            isTrue: (): boolean => {
                 return true
             }
         },
