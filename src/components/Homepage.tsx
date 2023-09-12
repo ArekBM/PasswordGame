@@ -1,4 +1,4 @@
-import Input from './Input'
+import TextArea from './TextArea'
 import Card from './Card'
 import { useState, useRef, useEffect } from 'react'
 import {captchas} from './Captcha'
@@ -10,7 +10,6 @@ import { puzzles } from './ChessPuzzles'
 interface Question {
     id: number
     text: string
-    ref?: string
     refresh?: Function;
     isTrue: (inputValue: string) => boolean
 }
@@ -472,7 +471,7 @@ export default function Home(){
         return question.isTrue(passwordInput)
     }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         
         setPasswordInput(e.target.value)
     }
@@ -538,17 +537,19 @@ export default function Home(){
                 <Maps />
             </LoadScript> */}
             <h1>* The Password Game</h1>
-            <div>
+            <div className='content-center justify-center'>
                 <h3 className='text-3xl font-bold underline'>Please choose a password</h3>
-                <Input value={passwordInput} onChange={handleInputChange} />
+                <div className='flex grid grid-cols-2 gap-4 items-center'>
+                    <TextArea value={passwordInput} onChange={handleInputChange} />
+                    <h3>{passwordInput.length}</h3>
+                </div>
                 <ul> 
                     {questions.map((q) =>{ 
                     if(!isQConditionMet(q)){
                         return (
-                            <li key={q.id}>
+                            <li key={q.id} className='flex border border-rounded content-center items-center'>
                                 <Card question={q.text} />
-                                {/* move rendering to Card component */}
-                                {q.refresh && <button onClick={() => refreshCaptcha()}>Click Me</button>}
+                                {q.refresh && <button onClick={() => refreshCaptcha()}>Refresh</button>}
                             </li>
                         )
                     }
