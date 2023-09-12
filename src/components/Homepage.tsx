@@ -37,10 +37,6 @@ export default function Home(){
 
     const questionIndex = useRef(0)
 
-    function isLeapYear(year: number): boolean {
-        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
-    }
-
     const questions: Question[] = [
         {
             id: 0,
@@ -304,6 +300,8 @@ export default function Home(){
             isTrue: (inputValue): boolean => {
                 const currentDate = new Date()
 
+                //Can change this logic
+
                 const currentHours = currentDate.getHours().toString().padStart(2, '0')
                 const currentMinutes = currentDate.getMinutes().toString().padStart(2, '0')
 
@@ -328,6 +326,10 @@ export default function Home(){
         //     }
         // }
     ]
+
+    function isLeapYear(year: number): boolean {
+        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
+    }
 
     function elementToAtomic(element: string): number {
         const elementToNumber : { [key: string] : number } = {
@@ -475,6 +477,8 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
+    //Fire start
+
     useEffect(() => {
         if(questionIndex.current === 16 && !fireFlag){
             const start = Math.floor(Math.random() * passwordInput.length)
@@ -485,20 +489,15 @@ export default function Home(){
         }
     }, [questionIndex.current])
 
+    //Fire spreading
+
     useEffect(() => {
         const fire = setInterval(() => {
             if(passwordInput.includes('🔥')){
-                const index = passwordInput.indexOf('🔥')
-                let updatedInput = passwordInput
-                console.log(passwordInput[0].charCodeAt(0).toString(16))
-
-                console.log(passwordInput[passwordInput.length - 1].codePointAt(0)?.toString(16))
-
-                
-
+                let updatedInput = passwordInput                
+                //This can be shortened
                 if((passwordInput[0].codePointAt(0)?.toString(16) !== 'd83d')){
                     if(Math.random() <= .5){
-                        console.log('left')
                         let firstIndex = passwordInput.indexOf('🔥')
                         updatedInput = passwordInput.substring(0, firstIndex - 1) + '🔥' + passwordInput.substring(firstIndex)
                     } else {
@@ -507,7 +506,6 @@ export default function Home(){
                             let rightDummy = updatedInput.substring(0, lastIndex + 2) + '🔥' + updatedInput.substring(lastIndex + 3)
                             updatedInput = rightDummy
                         }
-                        console.log('right')
                     }
                 } else {
                     if(updatedInput[updatedInput.length - 1].codePointAt(0)?.toString(16) != 'dd25'){
@@ -515,13 +513,14 @@ export default function Home(){
                         let rightDummy = updatedInput.substring(0, lastIndex + 2) + '🔥' + updatedInput.substring(lastIndex + 3)
                         updatedInput = rightDummy
                     }
-                    console.log('right')
                 }
                 setPasswordInput(updatedInput)
             }
         }, 800)
         return () => clearInterval(fire)
     }, [passwordInput])
+
+    //Paul eating
 
     useEffect(() => {
         const consumeFood = setInterval(() => {
