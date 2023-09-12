@@ -90,9 +90,9 @@ export default function Home(){
                         const digitValue = number - 48
                         total += digitValue
                     }
-                    if(total === 25){
-                        return true
-                    } 
+                }
+                if(total === 25){
+                    return true
                 }
                 return false
             }
