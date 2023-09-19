@@ -16,8 +16,8 @@ interface Question {
 
 export default function Home(){
     //TODO
-    //INDEX into Questions to conditionally render questions based on order
-
+    // Render previous questions and update if false 
+    
     const randomIndex = () => {
         return Math.floor(Math.random() * captchas.length)
     }
@@ -27,6 +27,8 @@ export default function Home(){
     const refreshCaptcha = () => {
         setCaptcha(captchas[randomIndex()].val)
     }
+
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
     const [passwordInput, setPasswordInput] = useState('')
 
@@ -40,7 +42,12 @@ export default function Home(){
         {
             id: 0,
             text: 'Your password must be at least 5 characters',
-            isTrue: (inputValue): boolean => inputValue.length >= 5
+            isTrue: (inputValue): boolean => {
+                if(inputValue.length >= 5){
+                    return true
+                }
+                return false
+            }
         },
         {
             id: 1,
@@ -48,7 +55,8 @@ export default function Home(){
             isTrue: (inputValue): boolean => {
                 for(let i = 0; i < inputValue.length; i++) {
                     let code = inputValue.charCodeAt(i);
-                    if((code > 47 && code < 58)) return true
+                    if((code > 47 && code < 58)){
+                    return true }
                 }
                 return false
             }
@@ -61,7 +69,8 @@ export default function Home(){
                     let code = inputValue.charCodeAt(i);
                     if(!(code > 47 && code < 58) &&
                     !(code > 64 && code < 91) &&
-                    !(code > 96 && code < 123)) return true
+                    !(code > 96 && code < 123)) {
+                    return true }
                 }
                 return false
             }
@@ -72,7 +81,8 @@ export default function Home(){
             isTrue: (inputValue): boolean => {
                 for(let i = 0; i < inputValue.length; i++){
                     let code = inputValue.charCodeAt(i);
-                    if((code > 64 && code < 91)) return true
+                    if((code > 64 && code < 91)){
+                    return true}
                 }
                 return false
             }
@@ -130,7 +140,10 @@ export default function Home(){
             id: 7,
             text: 'The roman numerals in your password should multiply to 35',
             isTrue: (inputValue): boolean => {
-                return checkProductEquals35(inputValue)
+                if(checkProductEquals35(inputValue)){
+                    return true
+                }
+                return false
             }
         },
         {
@@ -140,6 +153,7 @@ export default function Home(){
             isTrue: (inputValue): boolean => {
 
                 if(inputValue.includes(captcha)){
+
                     return true
                 }
                 return false
@@ -167,6 +181,7 @@ export default function Home(){
 
                 for(const element of elements){
                     if(inputValue.includes(element)){
+
                         return true
                     }
                 }
@@ -198,7 +213,10 @@ export default function Home(){
                         currentNumber = ''
                     }
                 } 
-                return hasLeapYear
+                if(hasLeapYear === true){
+                    return true
+                }
+                return false
             }
         },
         {
@@ -235,7 +253,6 @@ export default function Home(){
                 for(const element of elementsArr){
                     result += elementToAtomic(element)
                 }
-                
                 if(result === 200){
                     questionIndex.current = 16
                     return true
@@ -249,14 +266,19 @@ export default function Home(){
             isTrue: (inputValue): boolean => {
                 if(inputValue.includes('🔥')){
                     return false
+                } else {
+                    return true
                 }
-                return true
             }
         },
         {
             id: 17,
             text: 'Paul has now hatched, please remember to feed him.',
             isTrue: (inputValue): boolean =>  {
+                if(questionIndex.current === 17){
+                    const paulHatched = inputValue.replace('🥚', '🐣')
+                    setPasswordInput(paulHatched)
+                }
                 // Make function pop up window displaying catepillar, once copied then move to next 
                 if(inputValue.includes('🐛')){
                     return true
@@ -308,6 +330,7 @@ export default function Home(){
 
                 const currentTime = `${currentHours}:${currentMinutes}`
                 const nonMTime = `${nonMHours}:${currentMinutes}`
+                console.log(currentTime)
                 if(inputValue.includes(currentTime) || inputValue.includes(nonMTime)){
                     return true 
                 } else {
@@ -467,14 +490,16 @@ export default function Home(){
         return true
     }
     
-    const isQConditionMet = (question: Question) => {
-        return question.isTrue(passwordInput)
-    }
+    // const isQConditionMet = (question: Question) => {
+    //     return question.isTrue(passwordInput)
+    // }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         
         setPasswordInput(e.target.value)
     }
+
+    const s = '🐣'
 
     //Fire start
 
@@ -516,20 +541,38 @@ export default function Home(){
                 setPasswordInput(updatedInput)
             }
         }, 800)
-        return () => clearInterval(fire)
+        return () => {
+            clearInterval(fire)
+            questionIndex.current = 17
+        }
     }, [passwordInput])
 
     //Paul eating
 
     useEffect(() => {
         const consumeFood = setInterval(() => {
-            if(questionIndex.current === 16 && passwordInput.includes('🐛')){
+            if(questionIndex.current === 17 && passwordInput.includes('🐛')){
                 let paulAte = passwordInput.replace('🐛', '')
                 setPasswordInput(paulAte)
             }
         }, 20000)
         return () => clearInterval(consumeFood)
     }, [passwordInput])
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const currentQuestion = questions[currentQuestionIndex]
+            if(currentQuestion.isTrue(passwordInput)){
+                if(currentQuestionIndex < questions.length - 1){
+                    setCurrentQuestionIndex(currentQuestionIndex + 1)
+                } else{
+                    clearInterval(timer)
+                }
+            }
+        }, 500)
+        return () => clearInterval(timer)
+    }, [currentQuestionIndex, passwordInput]
+    )
 
     return (
         <>
@@ -544,7 +587,8 @@ export default function Home(){
                     <h3>{passwordInput.length}</h3>
                 </div>
                 <ul> 
-                    {questions.map((q) =>{ 
+                    {/* Rendered all at once BELOW ----------- */}
+                    {/* {questions.map((q) =>{ 
                     if(!isQConditionMet(q)){
                         return (
                             <li key={q.id} className='flex border border-rounded content-center items-center'>
@@ -554,6 +598,15 @@ export default function Home(){
                         )
                     }
                     }
+                    )} */}
+                    {/* Rendered one at a time BELOW ----------- */}
+                    {currentQuestionIndex < questions.length ? (
+                        <li key={currentQuestionIndex}>
+                            <Card question={questions[currentQuestionIndex].text} />
+                            {questions[currentQuestionIndex].refresh && <button onClick={() => refreshCaptcha()}>Refresh</button>}
+                        </li>
+                    ) : (
+                        <p></p>
                     )}
                 </ul>
             </div>
