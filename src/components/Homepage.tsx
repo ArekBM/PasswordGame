@@ -17,7 +17,7 @@ interface Question {
 export default function Home(){
     //TODO
     // Render previous questions and update if false 
-    
+
     const randomIndex = () => {
         return Math.floor(Math.random() * captchas.length)
     }
@@ -159,19 +159,20 @@ export default function Home(){
                 return false
             }
         },
-        {
-            id: 9,
-            text: 'Your password must include today\'s wordle answer',
-            isTrue: (): boolean => {
-                return true
-            }
-        },
+        // {
+        //     id: 9,
+        //     text: 'Your password must include today\'s wordle answer',
+        //     isTrue: (): boolean => {
+        //         return true
+        //     }
+        // },
         {
             id: 10,
             text: 'Your password must include a two letter symbol from the periodic table',
             isTrue: (inputValue): boolean => {
 
-                const elements = ['He', 'Li', 'Be', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'Cl', 'Ar', 'Ca', 'Sc', 'Ti', 'Cr', 'Mn', 'Fe', 'Co', 
+                const elements = [
+                'He', 'Li', 'Be', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'Cl', 'Ar', 'Ca', 'Sc', 'Ti', 'Cr', 'Mn', 'Fe', 'Co', 
                 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 
                 'In', 'Sn', 'Sb', 'Te', 'Xe', 'Cs', 'Ba', 'La', 'Hf', 'Ta', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 
                 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og',
@@ -188,13 +189,13 @@ export default function Home(){
                 return false
             }
         },
-        {
-            id: 11,
-            text: 'Your password must include the current phase of the moon as an emoji',
-            isTrue: (): boolean => {
-                return true
-            }
-        },
+        // {
+        //     id: 11,
+        //     text: 'Your password must include the current phase of the moon as an emoji',
+        //     isTrue: (): boolean => {
+        //         return true
+        //     }
+        // },
         {
             id: 12,
             text: 'Your password must include a leap year',
@@ -286,13 +287,13 @@ export default function Home(){
                 return false
             }
         }, 
-        {
-            id: 18,
-            text: 'A sacrifice must be made. Pick 2 letters that you will no longer be able to use.',
-            isTrue: (): boolean => {
-                return true
-            }
-        },
+        // {
+        //     id: 18,
+        //     text: 'A sacrifice must be made. Pick 2 letters that you will no longer be able to use.',
+        //     isTrue: (): boolean => {
+        //         return true
+        //     }
+        // },
         {
             id: 19, 
             text: 'Your password must include the length of your password',
@@ -498,8 +499,6 @@ export default function Home(){
         
         setPasswordInput(e.target.value)
     }
-
-    const s = '🐣'
 
     //Fire start
 
