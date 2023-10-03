@@ -36,6 +36,10 @@ export default function Home(){
 
     const [captcha, setCaptcha] = useState(captchas[index].val)
 
+    const [trueQs, setTrueQs] = useState<Question[]>([])
+
+    const [falseQs, setFalseQs] = useState<Question[]>([])
+
     const questionIndex = useRef(0)
 
     const questions: Question[] = [
@@ -563,15 +567,39 @@ export default function Home(){
             const currentQuestion = questions[currentQuestionIndex]
             if(currentQuestion.isTrue(passwordInput)){
                 if(currentQuestionIndex < questions.length - 1){
+                    let updatedTrueQs = [currentQuestion, ...trueQs]
+                    setTrueQs(updatedTrueQs)
                     setCurrentQuestionIndex(currentQuestionIndex + 1)
                 } else{
                     clearInterval(timer)
                 }
             }
-        }, 500)
+            
+        }, 50)
         return () => clearInterval(timer)
     }, [currentQuestionIndex, passwordInput]
     )
+
+    useEffect(() => {
+        const falseFinder = setInterval(() => {
+            for(let i = 0; i < trueQs.length; i++){
+                const currentQuestion = trueQs[i]
+                if(!currentQuestion.isTrue(passwordInput)){
+                    let updatedTrueQs = trueQs.filter(function (questions){
+                        if(questions.isTrue(passwordInput)){
+                            return questions
+                        }
+                    })
+                    setTrueQs(updatedTrueQs)
+                    let updatedFalseQs = [currentQuestion, ...falseQs]
+                    setFalseQs(updatedFalseQs)
+                } else {
+                    clearInterval(falseFinder)
+                }
+            }
+        }, 50)
+        return () => clearInterval(falseFinder)
+    }, [currentQuestionIndex, passwordInput])
 
     return (
         <>
@@ -599,15 +627,40 @@ export default function Home(){
                     }
                     )} */}
                     {/* Rendered one at a time BELOW ----------- */}
-                    {currentQuestionIndex < questions.length ? (
+                    {falseQs.map((q) => {
+                        return (
+                            <li key={q.id}>
+                                <Card question={q.text} className='text-red-600' />
+                            </li>
+                        )
+                    })}
+                    {(currentQuestionIndex < questions.length) ? (
                         <li key={currentQuestionIndex}>
                             <Card question={questions[currentQuestionIndex].text} />
                             {questions[currentQuestionIndex].refresh && <button onClick={() => refreshCaptcha()}>Refresh</button>}
                         </li>
                     ) : (
-                        <p></p>
+                        <></>
                     )}
+                    {trueQs.map((q) => {
+                        return (
+                            <li key={q.id}>
+                                <Card question={q.text} />
+                            </li>
+                        )
+                    })}
                 </ul>
+                {/* {answeredQs.map((q) => {
+                        q.isTrue(passwordInput) ? (
+                            <li key={q.id}>
+                                <Card question={q.text} />
+                            </li>
+                        ) : (
+                            <li key={q.id}>
+                                <Card question={q.text} style={{color: 'red'}}/>
+                            </li>
+                        )
+                })} */}
             </div>
         </>
     )
