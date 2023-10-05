@@ -262,6 +262,7 @@ export default function Home(){
                     questionIndex.current = 16
                     return true
                 }
+
                 return false
             } 
         },
@@ -299,7 +300,7 @@ export default function Home(){
         //     }
         // },
         {
-            id: 19, 
+            id: 18, 
             text: 'Your password must include the length of your password',
             isTrue:(inputValue): boolean => {
                 if(inputValue.includes(`${inputValue.length}`)){
@@ -310,7 +311,7 @@ export default function Home(){
             },
         },
         {
-            id: 20,
+            id: 19,
             text: 'The length of your password must be a prime number',
             isTrue: (inputValue): boolean => {
                 if(isPrime(inputValue.length) === true){
@@ -321,7 +322,7 @@ export default function Home(){
             }
         },
         {
-            id: 21,
+            id: 20,
             text: 'Your password must include the current time',
             isTrue: (inputValue): boolean => {
                 const currentDate = new Date()
@@ -335,8 +336,8 @@ export default function Home(){
 
                 const currentTime = `${currentHours}:${currentMinutes}`
                 const nonMTime = `${nonMHours}:${currentMinutes}`
-                console.log(currentTime)
                 if(inputValue.includes(currentTime) || inputValue.includes(nonMTime)){
+                    console.log('BANG')
                     return true 
                 } else {
                     return false
@@ -546,7 +547,6 @@ export default function Home(){
         }, 800)
         return () => {
             clearInterval(fire)
-            questionIndex.current = 17
         }
     }, [passwordInput])
 
@@ -562,36 +562,51 @@ export default function Home(){
         return () => clearInterval(consumeFood)
     }, [passwordInput])
 
+
+    //TODO Recheck false Q's
     useEffect(() => {
-        const timer = setInterval(() => {
+        const checkQTimer = setInterval(() => {
             const currentQuestion = questions[currentQuestionIndex]
-            if(currentQuestion.isTrue(passwordInput)){
+            // for(let i=0 ; i < falseQs.length; i++){
+            //     let updatedFalseQs = falseQs.filter(function (questions){
+            //         if(questions.isTrue(passwordInput)){
+            //             return questions
+            //         }
+            //     })
+            //     setFalseQs(updatedFalseQs)
+            // }
+            if(currentQuestion.isTrue(passwordInput) && falseQs.length === 0){
                 if(currentQuestionIndex < questions.length - 1){
                     let updatedTrueQs = [currentQuestion, ...trueQs]
                     setTrueQs(updatedTrueQs)
                     setCurrentQuestionIndex(currentQuestionIndex + 1)
                 } else{
-                    clearInterval(timer)
+                    clearInterval(checkQTimer)
                 }
             }
-            
+
         }, 50)
-        return () => clearInterval(timer)
+        return () => clearInterval(checkQTimer)
     }, [currentQuestionIndex, passwordInput]
     )
+
+    // Can make another useEffect to check falseQ array === 0, then re-add Q based on id
+
+
 
     useEffect(() => {
         const falseFinder = setInterval(() => {
             for(let i = 0; i < trueQs.length; i++){
-                const currentQuestion = trueQs[i]
-                if(!currentQuestion.isTrue(passwordInput)){
+                const foundFalseQ = trueQs[i]
+                if(!foundFalseQ.isTrue(passwordInput)){
+                    //Removes found false Q's from Answered Q's
                     let updatedTrueQs = trueQs.filter(function (questions){
                         if(questions.isTrue(passwordInput)){
                             return questions
                         }
                     })
                     setTrueQs(updatedTrueQs)
-                    let updatedFalseQs = [currentQuestion, ...falseQs]
+                    let updatedFalseQs = [foundFalseQ, ...falseQs]
                     setFalseQs(updatedFalseQs)
                 } else {
                     clearInterval(falseFinder)
@@ -601,6 +616,27 @@ export default function Home(){
         return () => clearInterval(falseFinder)
     }, [currentQuestionIndex, passwordInput])
 
+    useEffect(() => {
+            if(falseQs.length !== 0){
+                console.log('hi')
+                for(let i = 0; i < falseQs.length; i++){
+                    let foundTrueQ = falseQs[i]
+                    if(foundTrueQ.isTrue(passwordInput)){
+                        console.log('BANG')
+                        trueQs.push(foundTrueQ)
+                        let updatedFalseQs = falseQs.filter(function(q){
+                            if(!q.isTrue(passwordInput)){
+                                return q
+                            }
+                        })
+                        setFalseQs(updatedFalseQs)
+                        setTrueQs(trueQs)
+                    }
+                }
+            }      
+    }, [currentQuestionIndex, passwordInput])
+
+    console.log(falseQs)
     return (
         <>
             {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
@@ -629,14 +665,14 @@ export default function Home(){
                     {/* Rendered one at a time BELOW ----------- */}
                     {falseQs.map((q) => {
                         return (
-                            <li key={q.id}>
-                                <Card question={q.text} className='text-red-600' />
+                            <li key={q.id + 'falseQs'}>
+                                <Card question={q.text} red={true} />
                             </li>
                         )
                     })}
                     {(currentQuestionIndex < questions.length) ? (
                         <li key={currentQuestionIndex}>
-                            <Card question={questions[currentQuestionIndex].text} />
+                            <Card question={questions[currentQuestionIndex].text} red={false} />
                             {questions[currentQuestionIndex].refresh && <button onClick={() => refreshCaptcha()}>Refresh</button>}
                         </li>
                     ) : (
@@ -645,7 +681,7 @@ export default function Home(){
                     {trueQs.map((q) => {
                         return (
                             <li key={q.id}>
-                                <Card question={q.text} />
+                                <Card question={q.text} green={true} />
                             </li>
                         )
                     })}
