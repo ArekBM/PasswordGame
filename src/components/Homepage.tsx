@@ -240,7 +240,7 @@ export default function Home(){
             id: 14,
             text: '🥚 - This is my chicken Paul, He hasn\'t hatched yet, please put him in your password and keep him safe.',
             isTrue: (inputValue): boolean => {
-                if(inputValue.includes('🥚')){
+                if(inputValue.includes('🥚') || inputValue.includes('🐣')){
                     return true
                 }
                 return false
@@ -258,8 +258,10 @@ export default function Home(){
                 for(const element of elementsArr){
                     result += elementToAtomic(element)
                 }
-                if(result === 200){
+                if(result === 200 && fireFlag === false){
                     questionIndex.current = 16
+                    return true
+                } else if(result === 200 && fireFlag){
                     return true
                 }
 
@@ -505,16 +507,22 @@ export default function Home(){
         setPasswordInput(e.target.value)
     }
 
+    // Enables Paul to eat
+
+    if(fireFlag === true){
+        questionIndex.current = 17
+    }
+
     //Fire start
 
     useEffect(() => {
-        if(questionIndex.current === 16 && !fireFlag){
+        if(questionIndex.current === 16 && fireFlag === false){
             const start = Math.floor(Math.random() * passwordInput.length)
             const passwordOnFire = passwordInput.substring(0, start) + '🔥' + passwordInput.substring(start + 1, passwordInput.length)
             setPasswordInput(passwordOnFire)
             setFireFlag(true)
-            questionIndex.current = 17
         }
+
     }, [questionIndex.current])
 
     //Fire spreading
@@ -553,13 +561,12 @@ export default function Home(){
     //Paul eating
 
     useEffect(() => {
-        const consumeFood = setInterval(() => {
+        setInterval(() => {
             if(questionIndex.current === 17 && passwordInput.includes('🐛')){
                 let paulAte = passwordInput.replace('🐛', '')
                 setPasswordInput(paulAte)
             }
         }, 20000)
-        return () => clearInterval(consumeFood)
     }, [passwordInput])
 
 
@@ -592,8 +599,6 @@ export default function Home(){
 
     // Can make another useEffect to check falseQ array === 0, then re-add Q based on id
 
-
-
     useEffect(() => {
         const falseFinder = setInterval(() => {
             for(let i = 0; i < trueQs.length; i++){
@@ -617,12 +622,10 @@ export default function Home(){
     }, [currentQuestionIndex, passwordInput])
 
     useEffect(() => {
-            if(falseQs.length !== 0){
-                console.log('hi')
+            if(falseQs.length !== 0){     
                 for(let i = 0; i < falseQs.length; i++){
                     let foundTrueQ = falseQs[i]
                     if(foundTrueQ.isTrue(passwordInput)){
-                        console.log('BANG')
                         trueQs.push(foundTrueQ)
                         let updatedFalseQs = falseQs.filter(function(q){
                             if(!q.isTrue(passwordInput)){
@@ -636,7 +639,8 @@ export default function Home(){
             }      
     }, [currentQuestionIndex, passwordInput])
 
-    console.log(falseQs)
+    console.log(questionIndex.current)
+    console.log(fireFlag)
     return (
         <>
             {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
