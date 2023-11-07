@@ -3,6 +3,7 @@ import Card from './Card'
 import { useState, useRef, useEffect } from 'react'
 import {captchas} from './Captcha'
 import { puzzles } from './ChessPuzzles'
+import ParticleEngine from './Fireworks'
 // import Maps from './Maps'
 // import { LoadScript } from '@react-google-maps/api'
 // import { is69, getVideoDetails } from './Youtube'
@@ -41,6 +42,8 @@ export default function Home(){
     const [falseQs, setFalseQs] = useState<Question[]>([])
 
     const questionIndex = useRef(0)
+
+    const [ end, setEnd ] = useState(false)
 
     const questions: Question[] = [
         {
@@ -339,7 +342,7 @@ export default function Home(){
                 const currentTime = `${currentHours}:${currentMinutes}`
                 const nonMTime = `${nonMHours}:${currentMinutes}`
                 if(inputValue.includes(currentTime) || inputValue.includes(nonMTime)){
-                    console.log('BANG')
+                    setEnd(true)
                     return true 
                 } else {
                     return false
@@ -570,7 +573,6 @@ export default function Home(){
     }, [passwordInput])
 
 
-    //TODO Recheck false Q's
     useEffect(() => {
         const checkQTimer = setInterval(() => {
             const currentQuestion = questions[currentQuestionIndex]
@@ -596,9 +598,7 @@ export default function Home(){
         return () => clearInterval(checkQTimer)
     }, [currentQuestionIndex, passwordInput]
     )
-
-    // Can make another useEffect to check falseQ array === 0, then re-add Q based on id
-
+    
     useEffect(() => {
         const falseFinder = setInterval(() => {
             for(let i = 0; i < trueQs.length; i++){
@@ -639,17 +639,17 @@ export default function Home(){
             }      
     }, [currentQuestionIndex, passwordInput])
 
-    console.log(questionIndex.current)
-    console.log(fireFlag)
+
     return (
         <>
+            {end && <ParticleEngine />}
             {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
                 <Maps />
             </LoadScript> */}
             <h1>* The Password Game</h1>
-            <div className='content-center justify-center'>
+            <div className='flex flex-col content-center justify-center items-center'>
                 <h3 className='text-3xl font-bold underline'>Please choose a password</h3>
-                <div className='flex grid grid-cols-2 gap-4 items-center'>
+                <div className='flex grid grid-cols-2 gap-4 items-center justify-center content-center'>
                     <TextArea value={passwordInput} onChange={handleInputChange} />
                     <h3>{passwordInput.length}</h3>
                 </div>
