@@ -28,6 +28,7 @@ export default function Home(){
     const refreshCaptcha = () => {
         setCaptcha(captchas[randomIndex()].val)
     }
+    // Can condense to one obj
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
@@ -41,9 +42,9 @@ export default function Home(){
 
     const [falseQs, setFalseQs] = useState<Question[]>([])
 
-    const questionIndex = useRef(0)
-
     const [ end, setEnd ] = useState(false)
+
+    const questionIndex = useRef(0)
 
     const questions: Question[] = [
         {
