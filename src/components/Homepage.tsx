@@ -3,7 +3,7 @@ import Card from './Card'
 import { useState, useRef, useEffect } from 'react'
 import {captchas} from './Captcha'
 import { puzzles } from './ChessPuzzles'
-import ParticleEngine from './Fireworks'
+import EndModal from './EndMsg'
 // import Maps from './Maps'
 // import { LoadScript } from '@react-google-maps/api'
 // import { is69, getVideoDetails } from './Youtube'
@@ -433,6 +433,7 @@ export default function Home(){
         let prevValue = 0;
     
         for (let i = roman.length - 1; i >= 0; i--) {
+
             const currentChar = roman[i];
             const currentValue = romanNumerals[currentChar];
     
@@ -455,16 +456,20 @@ export default function Home(){
     
         for (let i = 0; i < n; i++) {
             let currentSubstr = '';
-            let j = i;
+            let temp = i;
     
-            while (j < n && isRomanNumeral(input[j])) {
-                currentSubstr += input[j];
-                j++;
+            while (temp < n && isRomanNumeral(input[temp])) {
+                currentSubstr += input[temp]
+                if (isRomanNumeral(input[temp])){
+                    temp++
+                } else {
+                    temp + 2
+                }
             }
     
             if (currentSubstr.length > 0) {
                 validSubstrings.push(currentSubstr);
-                i = j - 1; // Skip the checked substrings
+                i = temp - 1; // Skip the checked substrings
             }
         }
     
@@ -643,7 +648,10 @@ export default function Home(){
 
     return (
         <>
-            {end && <ParticleEngine />}
+            {end && <>
+                <EndModal isOpen={end} onClose={() => setEnd(false)}/>
+            </>
+            }
             {/* <LoadScript googleMapsApiKey={import.meta.env.VITE_REACT_APP_GOOGLE_KEY} libraries={['places']}>
                 <Maps />
             </LoadScript> */}
